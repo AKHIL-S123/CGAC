@@ -1,8 +1,9 @@
 import { Formik, Form, Field } from 'formik';
 
-export default function StudentForm({ degree, student, onSuccess }) {
-
-    const bloodGroups = [
+export default function StudentForm({ degree, student, onSuccess, id }) {
+    console.log(student?.applicationNumber, "student");
+    
+    const bloodGroups = [ 
         { value: '', label: 'Select Blood Group' },
         { value: 'A+', label: 'A+' },
         { value: 'A-', label: 'A-' },
@@ -115,8 +116,9 @@ export default function StudentForm({ degree, student, onSuccess }) {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
-      <h3 className="text-lg font-bold mb-4">{student ? 'Edit Student' : 'Add New Student'}</h3>
+      <h3 className="text-lg font-bold mb-4">{id ? 'Edit Student' : 'Add New Student'}</h3>
       <Formik
+        enableReinitialize={true} 
         initialValues={{
           applicationNumber: student?.applicationNumber || '',
           rank: student?.rank || '',
@@ -211,11 +213,12 @@ export default function StudentForm({ degree, student, onSuccess }) {
           hostlerOrDayScholar: student?.hostlerOrDayScholar || '',
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
-          const url = student
-            ? `http://localhost:8000/students/${student.id}`
-            : 'http://localhost:8000/students';
-          const method = student ? 'PUT' : 'POST';
 
+          const method = student ? "PUT" : "POST";
+          console.log(method,"method");
+
+          const url = student ? `https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application/${id}` : "https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application";
+          
           try {
             const response = await fetch(url, {
               method: method,
@@ -227,7 +230,7 @@ export default function StudentForm({ degree, student, onSuccess }) {
             if (response.ok) {
               setSubmitting(false);
               resetForm();
-              onSuccess();
+              // onSuccess();
             } else {
               throw new Error('Failed to save student');
             }

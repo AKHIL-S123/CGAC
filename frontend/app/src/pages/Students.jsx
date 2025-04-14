@@ -24,7 +24,7 @@ export default function Students() {
           </button>
 
           <StudentList degree={selectedDegree} onEdit={setEditingStudent} key={refresh} />
-          <StudentForm degree={selectedDegree} student={editingStudent} onSuccess={triggerRefresh} />
+          {/* <StudentForm degree={selectedDegree} student={editingStudent} onSuccess={triggerRefresh} /> */}
         </>
       )}
     </div>
