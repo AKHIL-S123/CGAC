@@ -6,7 +6,7 @@ const menu = [
   { name: 'Dashboard', path: '/', icon: <FiHome /> },
   { name: 'Profile', path: '/profile', icon: <FiUser /> },
   { name: 'Settings', path: '/settings', icon: <FiSettings /> },
-  { name: 'Students', path: '/students', icon: <FiUsers /> }, // New entry for Students
+  { name: 'Departments', path: '/departments', icon: <FiUsers /> }, // New entry for Students
 ]
 
 export default function Sidebar() {

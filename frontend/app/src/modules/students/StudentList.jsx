@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export default function StudentList({ degree, onEdit }) {
+export default function StudentList({ degree, subject }) {
   const [students, setStudents] = useState([])
   const [year, setYear] = useState('')
+
+  console.log("aki")
+  console.log(degree,subject)
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -27,7 +30,7 @@ export default function StudentList({ degree, onEdit }) {
   return (
     <div className="mt-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">{degree}</h2>
+        {/* <h2 className="text-xl font-bold">{`${degree} ${subject}`}</h2> */}
         <div>
           <input
             type="number"
@@ -44,6 +47,7 @@ export default function StudentList({ degree, onEdit }) {
         <table className="min-w-full bg-white border border-gray-300 rounded-md">
           <thead className="bg-gray-100 text-left">
             <tr>
+                 
               <th className="p-3 border-b">Application Number</th>
               <th className="p-3 border-b">Year</th>
               <th className="p-3 border-b">Actions</th>
@@ -53,7 +57,7 @@ export default function StudentList({ degree, onEdit }) {
             {filteredStudents.length > 0 ? (
               filteredStudents.map(student => (
                 <tr key={student.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{student?.applicationNumber}</td>
+                   <td className="p-3">{student?.applicationNumber}</td>
                   <td className="p-3">{student?.viStandardYearStart}</td>
                   <td className="p-3">
                     <button
@@ -77,4 +81,12 @@ export default function StudentList({ degree, onEdit }) {
       </div>
     </div>
   )
+
+  // return (<div>
+  //   <h1>hi</h1>
+  //    </div>
+
+  // )
+    
+  
 }
