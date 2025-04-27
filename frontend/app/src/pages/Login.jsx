@@ -43,7 +43,7 @@ function Login() {
       localStorage.setItem("user_role", userRole);
 
       console.log("Login successful! Role: " + userRole);
-      window.location.href = "/departments";  // Navigate to the dashboard
+      window.location.href = "/";  // Navigate to the dashboard
     } catch (err) {
       console.log(err);
       setError("Incorrect email or password.");
