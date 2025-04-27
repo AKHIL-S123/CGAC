@@ -1,8 +1,9 @@
 import { Formik, Form, Field } from 'formik';
 
-export default function StudentForm({ degree, student, onSuccess }) {
-
-    const bloodGroups = [
+export default function StudentForm({ degree, student, onSuccess, id }) {
+    console.log(student?.applicationNumber, "student");
+    
+    const bloodGroups = [ 
         { value: '', label: 'Select Blood Group' },
         { value: 'A+', label: 'A+' },
         { value: 'A-', label: 'A-' },
@@ -55,6 +56,7 @@ export default function StudentForm({ degree, student, onSuccess }) {
         { value: 'joint', label: 'Joint' }
        
       ]
+    
 
       const religionOptions = [
         { value: '', label: 'Select Religion' },
@@ -115,8 +117,9 @@ export default function StudentForm({ degree, student, onSuccess }) {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
-      <h3 className="text-lg font-bold mb-4">{student ? 'Edit Student' : 'Add New Student'}</h3>
+      <h3 className="text-lg font-bold mb-4">{id ? 'Edit Student' : 'Add New Student'}</h3>
       <Formik
+        enableReinitialize={true} 
         initialValues={{
           applicationNumber: student?.applicationNumber || '',
           rank: student?.rank || '',
@@ -128,9 +131,9 @@ export default function StudentForm({ degree, student, onSuccess }) {
           course: student?.course || '',
           mediumOfStudy: student?.mediumOfStudy || '',
           percentageOfMarks: student?.percentageOfMarks || '',
-          name: student?.name || '',
           mobile: student?.mobile || '',
           whatsappNo: student?.whatsappNo || '',
+          name: student?.name || '',
           email: student?.email || '',
           aadhaarNumber: student?.aadhaarNumber || '',
           religion: student?.religion || '',
@@ -165,10 +168,10 @@ export default function StudentForm({ degree, student, onSuccess }) {
           singleParent: student?.singleParent || '',
           firstGraduate: student?.firstGraduate || '',
           firstGraduateCertificateNo: student?.firstGraduateCertificateNo || '',
-          incomeCertificateNo: student?.incomeCertificateNo || '',
           annualIncome: student?.annualIncome || '',
           viStandardSchoolName: student?.viStandardSchoolName || '',
           viStandardCity: student?.viStandardCity || '',
+          incomeCertificateNo: student?.incomeCertificateNo || '',
           viStandardType: student?.viStandardType || '',
           viStandardYearStart: student?.viStandardYearStart || '',
           viStandardYearEnd: student?.viStandardYearEnd || '',
@@ -211,11 +214,12 @@ export default function StudentForm({ degree, student, onSuccess }) {
           hostlerOrDayScholar: student?.hostlerOrDayScholar || '',
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
-          const url = student
-            ? `http://localhost:8000/students/${student.id}`
-            : 'http://localhost:8000/students';
-          const method = student ? 'PUT' : 'POST';
 
+          const method = student ? "PUT" : "POST";
+          console.log(method,"method");
+
+          const url = student ? `https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application/${id}` : "https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application";
+          
           try {
             const response = await fetch(url, {
               method: method,
@@ -227,7 +231,7 @@ export default function StudentForm({ degree, student, onSuccess }) {
             if (response.ok) {
               setSubmitting(false);
               resetForm();
-              onSuccess();
+              // onSuccess();
             } else {
               throw new Error('Failed to save student');
             }
@@ -239,6 +243,7 @@ export default function StudentForm({ degree, student, onSuccess }) {
       >
         {({ isSubmitting }) => (
           <Form className="space-y-4 ">
+            {/* 1st div ******************************************************/}
             <div className='grid grid-cols-3 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">Application Number</label>
@@ -385,10 +390,10 @@ export default function StudentForm({ degree, student, onSuccess }) {
             <div>
               <label className="block text-sm text-gray-600">NCC</label>
               <Field name="ncc" className="border px-3 py-2 rounded w-full" />
-            </div>
             <div>
               <label className="block text-sm text-gray-600">Sports</label>
               <Field name="sports" className="border px-3 py-2 rounded w-full" />
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Category of Sports</label>
@@ -414,6 +419,34 @@ export default function StudentForm({ degree, student, onSuccess }) {
               <label className="block text-sm text-gray-600">Communication Address</label>
               <Field name="communicationAddress" className="border px-3 py-2 rounded w-full" />
             </div>
+            <div>
+              <label  className="block text-sm text-gray-600">First Graduate</label>
+              <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
+              {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+            </Field>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
+              <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Income Certificate No.</label>
+              <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Annual Income</label>
+              <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
+            </div>
+              
+            </div>
+ 
+            {/************************************  PARENTS INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> PARENTS INFO </h1>
+            <div className='grid grid-cols-4 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">Father Name</label>
               <Field name="fatherName" className="border px-3 py-2 rounded w-full" />
@@ -443,12 +476,14 @@ export default function StudentForm({ degree, student, onSuccess }) {
                     ))}
             </Field>
             </div>
+
             <div>
-              <label className="block text-sm text-gray-600">Mother Name</label>
-              <Field name="motherName" className="border px-3 py-2 rounded w-full" />
+            <label className="block text-sm text-gray-600">Mother Name</label>
+            <Field name="motherName" className="border px-3 py-2 rounded w-full" />
             </div>
+
             <div>
-              <label className="block text-sm text-gray-600">Mobile Number</label>
+            <label className="block text-sm text-gray-600">Mobile Number</label>
               <Field name="motherMobile" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
@@ -489,29 +524,11 @@ export default function StudentForm({ degree, student, onSuccess }) {
                     ))}
             </Field>
             </div>
-            <div>
-              <label  className="block text-sm text-gray-600">First Graduate</label>
-              <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
-              {yesNoOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
-              <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Income Certificate No.</label>
-              <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Annual Income</label>
-              <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-            </div>
+           
+
+              </div>
+            {/* ******************************  SCHOOL INFO *********************************/}
+            <h1 className='text-30px font-bold  text-center'> SCHOOL INFO </h1>
             <div className='grid grid-cols-4 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">VI Standard School Name</label>
@@ -551,7 +568,7 @@ export default function StudentForm({ degree, student, onSuccess }) {
                   </option>
                 ))}
             </Field>
-            </div>
+            </div> 
 
             </div>
             <div>
@@ -575,7 +592,25 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="viiStandardYear" className="border px-3 py-2 rounded w-full" />
+              
+              <div className='flex justify-between'>
+              <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">VIII Standard School Name</label>
@@ -597,7 +632,24 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="viiiStandardYear" className="border px-3 py-2 rounded w-full" />
+              <div className='flex justify-between'>
+              <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">IX Standard School Name</label>
@@ -619,7 +671,24 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="ixStandardYear" className="border px-3 py-2 rounded w-full" />
+              <div className='flex justify-between'>
+              <Field as="select" name="ixStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="ixStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">X Standard School Name</label>
@@ -641,7 +710,24 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="xStandardYear" className="border px-3 py-2 rounded w-full" />
+              <div className='flex justify-between'>
+              <Field as="select" name="xStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="xStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">XI Standard School Name</label>
@@ -664,7 +750,24 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="xiStandardYear" className="border px-3 py-2 rounded w-full" />
+              <div className='flex justify-between'>
+              <Field as="select" name="xiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="xiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+            </div>
             </div>
             <div>
               <label className="block text-sm text-gray-600">XII Standard School Name</label>
@@ -688,10 +791,28 @@ export default function StudentForm({ degree, student, onSuccess }) {
             </div>
             <div>
               <label className="block text-sm text-gray-600">Year of Study</label>
-              <Field name="xiiStandardYear" className="border px-3 py-2 rounded w-full" />
+              <div className='flex justify-between'>
+              <Field as="select" name="xiiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
+              <Field as="select" name="xiiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+             
+              {yearOptions.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+            </Field>
             </div>
             </div>
-            
+            </div>
+            <h1 className='text-30px font-bold  text-center'> BANK INFO </h1>
+            {/* 4th div */}
             <div className='grid grid-cols-3 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">Bank Name</label>
@@ -730,6 +851,8 @@ export default function StudentForm({ degree, student, onSuccess }) {
               <Field name="bankAccountNo" className="border px-3 py-2 rounded w-full" />
             </div>
             </div>
+
+            {/* 5th div */}
             <div>
               <label className="block text-sm text-gray-600">Hostler / Day Scholar</label>
               <Field as='select' name="hostlerOrDayScholar" className="border px-3 py-2 rounded w-full">
