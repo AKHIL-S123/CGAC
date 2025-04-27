@@ -6,11 +6,11 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Students from './pages/Students';
 import Departments from './pages/Department';
+
 import CreateStudent from './pages/CreateStudent';
 import Login from './pages/Login';
 import ProtectedRoute from './components/Protected';
 import { useLocation } from 'react-router-dom';
-
 export default function App() {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -42,8 +42,8 @@ function Login() {
       // Store user role in localStorage
       localStorage.setItem("user_role", userRole);
 
-      alert("Login successful! Role: " + userRole);
-      window.location.href = "/dashboard";  // Navigate to the dashboard
+      console.log("Login successful! Role: " + userRole);
+      window.location.href = "/departments";  // Navigate to the dashboard
     } catch (err) {
       console.log(err);
       setError("Incorrect email or password.");

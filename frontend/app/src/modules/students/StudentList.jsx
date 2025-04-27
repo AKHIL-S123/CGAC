@@ -1,68 +1,134 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '../../actions/api';
 
 export default function StudentList({ degree, subject }) {
-  const [students, setStudents] = useState([])
-  const [year, setYear] = useState('')
+  const [students, setStudents] = useState([]);
+  const [year, setYear] = useState(new Date().getFullYear().toString()); // Default to current year
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  console.log("aki")
-  console.log(degree,subject)
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      const response = await fetch(`https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application`)
-      const data = await response.json()
-      console.log(data, "dsdejn")
+  // Function to fetch students based on current page and batch year
+  const fetchStudents = async () => {
+    try {
+      console.log('Started to fetch students...');
+      
+      setLoading(true); // Start loading
 
-      setStudents(data?.item)
+      // Make the API call to get students based on the current page and batch year
+      const data = await apiRequest({
+        url: 'https://cgac-backend.onrender.com/students',
+        method: 'GET',
+        params: { page: currentPage, limit: 100, batch: year },
+      });
+
+      console.log('Fetched students data:', data);
+
+      // Update the state with the fetched students data
+      setStudents(data.data || []);
+      setTotalPages(data.paging.total_page || 1);  // Set total pages for pagination
+    } catch (error) {
+      console.error('Failed to fetch students:', error);
+    } finally {
+      setLoading(false);  // Stop loading
     }
+  };
 
-    fetchStudents()
-  }, [degree, year])
+  // Fetch students on initial load and whenever currentPage or year changes
+  useEffect(() => {
+    fetchStudents();  // Fetch the students when currentPage or year changes
+  }, [currentPage, year]);  // This triggers every time currentPage or year changes
 
-  // Filter students by year (if any year is entered)
-  const filteredStudents = students.filter(student =>
-    year === '' || student.year?.toString() === year
-  )
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
-  const navigate  = useNavigate()
+  // Handle year change
+  const handleYearChange = (e) => {
+    setYear(e.target.value);  // This will trigger fetchStudents to be called on year change
+  };
+
+  // Handle pagination changes
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);  // This will trigger fetchStudents to be called on page change
+  };
+
+  // Check if we need to disable the Next button
+  const isNextPageDisabled = () => {
+    return currentPage >= totalPages;
+  };
+
+  // Filter students based on the search query
+  const filteredStudents = students.filter(
+    (student) =>
+      (searchQuery === '' ||
+        student.applicationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
-    <div className="mt-6">
-      <div className="flex items-center justify-between mb-4">
-        {/* <h2 className="text-xl font-bold">{`${degree} ${subject}`}</h2> */}
-        <div>
-          <input
-            type="number"
-            placeholder="Filter by year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="border rounded px-3 py-1 text-sm mx-3"
-          />
-          <button className="bg-blue-500 text-white px-3 py-1 rounded" onClick={() => navigate('/add-student')}>Add student</button>
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      {/* Filters and Search */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center">
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="Filter by Batch"
+              value={year}
+              onChange={handleYearChange}
+              className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              placeholder="Search by Application Number or Name"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+            onClick={() => navigate('/add-student')}
+          >
+            Add Student
+          </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Table */}
+      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg shadow-md">
         <table className="min-w-full bg-white border border-gray-300 rounded-md">
-          <thead className="bg-gray-100 text-left">
+          <thead className="bg-gray-100 text-left text-sm shadow-md">
             <tr>
-                 
-              <th className="p-3 border-b">Application Number</th>
-              <th className="p-3 border-b">Year</th>
-              <th className="p-3 border-b">Actions</th>
+              <th className="p-4 border-b">Application Number</th>
+              <th className="p-4 border-b">Name</th>
+              <th className="p-4 border-b">Batch</th>
+              <th className="p-4 border-b">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredStudents.length > 0 ? (
-              filteredStudents.map(student => (
-                <tr key={student.id} className="border-t hover:bg-gray-50">
-                   <td className="p-3">{student?.applicationNumber}</td>
-                  <td className="p-3">{student?.viStandardYearStart}</td>
-                  <td className="p-3">
+          <tbody className="max-h-60 overflow-y-auto">
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="p-4 text-center text-gray-500">
+                  Loading...
+                </td>
+              </tr>
+            ) : filteredStudents.length > 0 ? (
+              filteredStudents.map((student) => (
+                <tr key={student._id} className="border-t hover:bg-gray-50">
+                  <td className="p-4">{student.applicationNumber}</td>
+                  <td className="p-4">{student.name}</td>
+                  <td className="p-4">{student.batch}</td>
+                  <td className="p-4">
                     <button
-                      className="text-blue-600 text-sm"
-                      onClick={() => navigate(`/edit-student/${student.id}`)}
+                      className="text-blue-600 text-sm hover:text-blue-800"
+                      onClick={() => navigate(`/edit-student/${student._id}`)}
                     >
                       Edit
                     </button>
@@ -71,7 +137,7 @@ export default function StudentList({ degree, subject }) {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="p-3 text-center text-gray-500">
+                <td colSpan="4" className="p-4 text-center text-gray-500">
                   No students found.
                 </td>
               </tr>
@@ -79,14 +145,29 @@ export default function StudentList({ degree, subject }) {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          disabled={isNextPageDisabled()}
+        >
+          Next
+        </button>
+      </div>
     </div>
-  )
-
-  // return (<div>
-  //   <h1>hi</h1>
-  //    </div>
-
-  // )
-    
-  
+  );
 }
