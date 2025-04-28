@@ -129,11 +129,17 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           umisNo: student?.umisNo || '',
           degree: degree || '',
           course: student?.course || '',
+          courseType: student?.courseType || '',
+          cutoff : student?.cutoff|| '',
+          batch : student?.batch || '',
+          stream : student?.stream || '',
           mediumOfStudy: student?.mediumOfStudy || '',
           percentageOfMarks: student?.percentageOfMarks || '',
           mobile: student?.mobile || '',
           whatsappNo: student?.whatsappNo || '',
           name: student?.name || '',
+          nameAadhaar:student?.name ||'',
+          nameCertificate:student?.name ||'',
           email: student?.email || '',
           aadhaarNumber: student?.aadhaarNumber || '',
           religion: student?.religion || '',
@@ -151,6 +157,7 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           sports: student?.sports || '',
           categoryOfSports: student?.categoryOfSports || '',
           admissionQuota: student?.admissionQuota || '',
+          studentStatus:student?.studentStatus|| '',
           dateOfAdmission: student?.dateOfAdmission || '',
           admissionNumber: student?.admissionNumber || '',
           presentAddress: student?.presentAddress || '',
@@ -166,12 +173,13 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           guardianName: student?.guardianName || '',
           guardianNumber: student?.guardianNumber || '',
           singleParent: student?.singleParent || '',
+          singleGirlChild: student?.singleGirlChild || '',
           firstGraduate: student?.firstGraduate || '',
           firstGraduateCertificateNo: student?.firstGraduateCertificateNo || '',
           annualIncome: student?.annualIncome || '',
+          incomeCertificateNo: student?.incomeCertificateNo || '',
           viStandardSchoolName: student?.viStandardSchoolName || '',
           viStandardCity: student?.viStandardCity || '',
-          incomeCertificateNo: student?.incomeCertificateNo || '',
           viStandardType: student?.viStandardType || '',
           viStandardYearStart: student?.viStandardYearStart || '',
           viStandardYearEnd: student?.viStandardYearEnd || '',
@@ -244,14 +252,30 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
         {({ isSubmitting }) => (
           <Form className="space-y-4 ">
             {/* 1st div ******************************************************/}
+             {/************************************  STUDENT BASIC INFO************************************** */}
+             <h1 className='text-30px font-bold  text-center'> STUDENT BASIC INFO </h1>
             <div className='grid grid-cols-3 gap-4'>
             <div>
-              <label className="block text-sm text-gray-600">Application Number</label>
-              <Field name="applicationNumber" className="border px-3 py-2 rounded w-full" />
+              <label className="block text-sm text-gray-600">Name</label>
+              <Field name="name" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
-              <label className="block text-sm text-gray-600">Rank</label>
-              <Field name="rank" className="border px-3 py-2 rounded w-full" />
+              <label className="block text-sm text-gray-600">As in AADHAAR</label>
+              <Field name="nameAadhaar" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">As in Certificate</label>
+              <Field name="nameCertificate" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Gender</label>
+              <Field as="select" name="gender" className="border px-3 py-2 rounded w-full" >
+              {sex.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                    </Field>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Register No</label>
@@ -269,33 +293,13 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <label className="block text-sm text-gray-600">UMIS No.</label>
               <Field name="umisNo" className="border px-3 py-2 rounded w-full" />
             </div>
-            <div>
-              <label className="block text-sm text-gray-600">Degree</label>
-              <Field name="degree" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Course</label>
-              <Field name="course" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Medium of Study</label>
-              <Field as='select' name="mediumOfStudy" className="border px-3 py-2 rounded w-full" >
+          
               
-              {mediumOfStudyOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
             </div>
-            <div>
-              <label className="block text-sm text-gray-600">Percentage of Marks in +2</label>
-              <Field name="percentageOfMarks" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Name</label>
-              <Field name="name" className="border px-3 py-2 rounded w-full" />
-            </div>
+
+            {/************************************  STUDENT PERSONAL INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> STUDENT PERSONAL INFO </h1>
+            <div className='grid grid-cols-4 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">Mobile</label>
               <Field name="mobile" className="border px-3 py-2 rounded w-full" />
@@ -312,6 +316,21 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <label className="block text-sm text-gray-600">Aadhaar Number</label>
               <Field name="aadhaarNumber" className="border px-3 py-2 rounded w-full" />
             </div>
+            <div>
+              <label className="block text-sm text-gray-600">Date of Birth</label>
+              <Field name="dateOfBirth" type="date" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Blood Group</label>
+              <Field as="select" name="bloodGroup" className="border px-3 py-2 rounded w-full">
+                    {bloodGroups.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                </Field>
+            </div>
+
             <div>
               <label className="block text -sm text-gray-600">Religion</label>
               <Field as="select" name="religion" className="border px-3 py-2 rounded w-full" >
@@ -342,30 +361,6 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <Field name="communityCertificateNo" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
-              <label className="block text-sm text-gray-600">Date of Birth</label>
-              <Field name="dateOfBirth" type="date" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Gender</label>
-              <Field as="select" name="gender" className="border px-3 py-2 rounded w-full" >
-              {sex.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Blood Group</label>
-              <Field as="select" name="bloodGroup" className="border px-3 py-2 rounded w-full">
-                    {bloodGroups.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                </Field>
-            </div>
-            <div>
               <label className="block text-sm text-gray-600">PwD</label>
               <Field as='select' name="pwd" className="border px-3 py-2 rounded w-full" >
               {yesNoOptions.map((group) => (
@@ -390,14 +385,81 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
             <div>
               <label className="block text-sm text-gray-600">NCC</label>
               <Field name="ncc" className="border px-3 py-2 rounded w-full" />
+              </div>
             <div>
               <label className="block text-sm text-gray-600">Sports</label>
               <Field name="sports" className="border px-3 py-2 rounded w-full" />
+           
             </div>
-            </div>
+
             <div>
               <label className="block text-sm text-gray-600">Category of Sports</label>
               <Field name="categoryOfSports" className="border px-3 py-2 rounded w-full" />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600">Present Address</label>
+              <Field name="presentAddress" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Communication Address</label>
+              <Field name="communicationAddress" className="border px-3 py-2 rounded w-full" />
+            </div>
+
+            </div>
+                  
+           {/************************************  ADMISSION INFO************************************** */}
+           <h1 className='text-30px font-bold  text-center'> ADMISSION INFORMATION </h1>
+
+           
+                    
+           <div className='grid grid-cols-4 gap-4'>
+
+           <div>
+              <label className="block text-sm text-gray-600">Application Number</label>
+              <Field name="applicationNumber" className="border px-3 py-2 rounded w-full" />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600">Rank</label>
+              <Field name="rank" className="border px-3 py-2 rounded w-full" />
+
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Cut Off</label>
+              <Field name="cutoff" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">batch</label>
+              <Field name="batch" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Stream</label>
+              <Field name="stream" className="border px-3 py-2 rounded w-full" />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600">Degree</label>
+              <Field name="degree" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Course Type</label>
+              <Field name="courseType" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Course</label>
+              <Field name="course" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Medium of Study</label>
+              <Field as='select' name="mediumOfStudy" className="border px-3 py-2 rounded w-full" >
+              
+              {mediumOfStudyOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+            </Field>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Admission Quota</label>
@@ -412,40 +474,34 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <Field name="admissionNumber" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
-              <label className="block text-sm text-gray-600">Present Address</label>
-              <Field name="presentAddress" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Communication Address</label>
-              <Field name="communicationAddress" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label  className="block text-sm text-gray-600">First Graduate</label>
-              <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
-              {yesNoOptions.map((group) => (
+              <label className="block text-sm text-gray-600">Hostler / Day Scholar</label>
+              <Field as='select' name="hostlerOrDayScholar" className="border px-3 py-2 rounded w-full">
+              
+              {hostler.map((group) => (
                     <option key={group.value} value={group.value}>
                         {group.label}
                     </option>
                     ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
-              <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Income Certificate No.</label>
-              <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Annual Income</label>
-              <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
+                    </Field>
               
             </div>
- 
-            {/************************************  PARENTS INFO************************************** */}
-            <h1 className='text-30px font-bold  text-center'> PARENTS INFO </h1>
+            <div>
+              <label className="block text-sm text-gray-600">Student Status</label>
+              <Field as='select' name="studentStatus" className="border px-3 py-2 rounded w-full">
+              
+              {hostler.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                    </Field>
+              
+            </div>
+
+           </div>
+
+            {/************************************  FAMILY INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> FAMILY INFORMATION </h1>
             <div className='grid grid-cols-4 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">Father Name</label>
@@ -524,11 +580,44 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
                     ))}
             </Field>
             </div>
+            <div>
+              <label className="block text-sm text-gray-600">Single Girl Child</label>
+              <Field as = "select" name="singleGirlChild" className="border px-3 py-2 rounded w-full" >
+               {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+            </Field>
+            </div>
+
+            <div>
+              <label  className="block text-sm text-gray-600">First Graduate</label>
+              <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
+              {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+            </Field>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
+              <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Income Certificate No.</label>
+              <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Annual Income</label>
+              <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
+            </div>
            
 
               </div>
             {/* ******************************  SCHOOL INFO *********************************/}
-            <h1 className='text-30px font-bold  text-center'> SCHOOL INFO </h1>
+            <h1 className='text-30px font-bold  text-center'> PREVIOUS SCHOOL INFORMATION </h1>
             <div className='grid grid-cols-4 gap-4'>
             <div>
               <label className="block text-sm text-gray-600">VI Standard School Name</label>
@@ -810,6 +899,13 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
             </Field>
             </div>
             </div>
+
+            <div>
+              <label className="block text-sm text-gray-600">Percentage of Marks in +2</label>
+              <Field name="percentageOfMarks" type="number" className="border px-3 py-2 rounded w-full" />
+            </div>
+           
+              
             </div>
             <h1 className='text-30px font-bold  text-center'> BANK INFO </h1>
             {/* 4th div */}
@@ -853,18 +949,7 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
             </div>
 
             {/* 5th div */}
-            <div>
-              <label className="block text-sm text-gray-600">Hostler / Day Scholar</label>
-              <Field as='select' name="hostlerOrDayScholar" className="border px-3 py-2 rounded w-full">
-              
-              {hostler.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-              
-            </div>
+         
             <button
               type="submit"
               disabled={isSubmitting}
