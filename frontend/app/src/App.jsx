@@ -6,13 +6,12 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Students from './pages/Students';
 import Departments from './pages/Department';
-
-import CreateStudent from './pages/CreateStudent';
 import Login from './pages/Login';
 import ProtectedRoute from './components/Protected';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
 import 'react-toastify/dist/ReactToastify.css';
+import StudentForm from './modules/students/StudentForm';
 export default function App() {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -111,7 +110,7 @@ export default function App() {
           path="/add-student"
           element={
             <ProtectedRoute requiredRole="admin" role={role} loading={loading}>
-              <CreateStudent />
+              <StudentForm />
             </ProtectedRoute>
           }
         />
@@ -119,7 +118,7 @@ export default function App() {
           path="/edit-student/:id"
           element={
             <ProtectedRoute requiredRole="admin" role={role} loading={loading}>
-              <CreateStudent />
+              <StudentForm />
             </ProtectedRoute>
           }
         />

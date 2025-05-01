@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { FaTrash, FaEdit } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../actions/api';
 import Modal from './Modal'; // Import Modal component
+import DeleteStudentButton from './DeleteStudent';
 
 export default function StudentList({ degree, subject }) {
   const [students, setStudents] = useState([]);
@@ -110,19 +112,28 @@ export default function StudentList({ degree, subject }) {
                 <tr
                   key={student._id}
                   className="border-t hover:bg-gray-50 cursor-pointer"
-                  onClick={() => handleRowClick(student)} // Open the modal on row click
+                  // Open the modal on row click
                 >
-                  <td className="p-4">{student.applicationNumber}</td>
-                  <td className="p-4">{student.name}</td>
-                  <td className="p-4">{student.batch}</td>
-                  <td className="p-4">
+                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.applicationNumber}</td>
+                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.name}</td>
+                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.batch}</td>
+                  <td className="p-4 flex justify-around">
                     <button
-                      className="text-blue-600 text-sm hover:text-blue-800"
-                      onClick={() => navigate(`/edit-student/${student._id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/edit-student/${student._id}`);
+                      }}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Edit"
                     >
-                      Edit
+                      <FaEdit size={20} />
                     </button>
-                  </td>
+
+                      <DeleteStudentButton
+                        studentId={student._id}
+                        onDeleteSuccess={fetchStudents}
+                      />
+                    </td>
                 </tr>
               ))
             ) : (

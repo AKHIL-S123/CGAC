@@ -18,14 +18,15 @@ export default function Sidebar() {
       <div className="flex items-center justify-between p-4">
         {/* {!collapsed && <h1 className="text-xl font-bold">MyApp</h1>} */}
         {!collapsed &&  
-          <div className='flex items-center gap-2'>
-            <img src={logo} alt="Logo" className="h-20 w-auto" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              CGAC
-            </h1>
-          </div>
-        }
+  <div className='flex items-center gap-2'>
+    <img src={logo} alt="Logo" className="h-20 w-auto" />
+    <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+      CGAC
+    </h1>
+  </div>
+}
 
+       
         <button onClick={() => setCollapsed(!collapsed)}>
           <FiMenu size={20} />
         </button>
@@ -37,7 +38,9 @@ export default function Sidebar() {
             to={path}
             key={name}
             className={({ isActive }) =>
-              `flex items-center gap-4 p-3 mx-2 rounded-lg hover:bg-gray-200 transition-all duration-300 transform ${isActive ? 'bg-gray-300 font-semibold' : ''} hover:scale-105 hover:shadow-lg`
+              `flex items-center gap-4 p-3 mx-2 rounded-lg hover:bg-gray-200 ${
+                isActive ? 'bg-gray-300 font-semibold' : ''
+              }`
             }
           >
             <span className="text-lg">{icon}</span>

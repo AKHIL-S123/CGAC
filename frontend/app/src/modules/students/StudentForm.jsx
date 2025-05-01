@@ -1,155 +1,86 @@
 import { Formik, Form, Field } from 'formik';
+import { 
+  bloodGroups, courseList,courseTypeList,
+  streamList,sex,hostler,schooltype,bankOptions,accountOptions,
+  religionOptions,communityOptions,occupationOptions,educationQualificationOptions,mediumOfStudyOptions,yesNoOptions,
+  nationalityList,degreeList,
+  studentStatusList
+ } from './constants';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState,useEffect } from 'react';
 
-export default function StudentForm({ degree, student, onSuccess, id }) {
+
+export default function StudentForm() {
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(id);
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
     console.log(student?.applicationNumber, "student");
     
-    const bloodGroups = [ 
-        { value: '', label: 'Select Blood Group' },
-        { value: 'A+', label: 'A+' },
-        { value: 'A-', label: 'A-' },
-        { value: 'B+', label: 'B+' },
-        { value: 'B-', label: 'B-' },
-        { value: 'AB+', label: 'AB+' },
-        { value: 'AB-', label: 'AB-' },
-        { value: 'O+', label: 'O+' },
-        { value: 'O-', label: 'O-' },
-      ];
-    
-      const sex = [
-        { value: '', label: 'Select Gender' },
-        { value: 'Female', label: 'Female' },
-        { value: 'Male', label: 'Male' },
-        { value: 'Third Gender', label: 'Third Gender' }
-      ]
-
-      const hostler =[
-        { value: '', label: 'Select' },
-        { value: 'hostler', label: 'Hostler' },
-        { value: 'day-scholar', label: 'Day Scholar' }
-      ]
-
-      const schooltype = [
-        { value: '', label: 'Select' },
-        { value: 'govt', label: 'Govt' },
-        { value: 'fully-aided', label: 'Fully Aided' },
-        { value: 'partly-aided', label: 'Partly Aided' },
-        { value: 'private', label: 'Private' }
-      ];
-
-      const bankOptions = [
-        { value: '', label: 'Select Bank Name' },
-        { value: 'sbi', label: 'SBI' },
-        { value: 'ib', label: 'IB' },
-        { value: 'canara', label: 'CANARA' },
-        { value: 'iob', label: 'IOB' },
-        { value: 'india-postal-bank', label: 'India Postal Bank' },
-        { value: 'bob', label: 'BoB' },
-        { value: 'ub', label: 'UB' },
-        { value: 'boi', label: 'BOI' },
-        { value: 'others', label: 'Others' }
-      ];
-  
-
-      const accountOptions = [
-        
-        { value: '', label:'Select Account Type' },
-        { value: 'self', label: 'Self' },
-        { value: 'joint', label: 'Joint' }
-       
-      ]
-    
-
-      const religionOptions = [
-        { value: '', label: 'Select Religion' },
-        { value: 'hindu', label: 'Hindu' },
-        { value: 'christian', label: 'Christian' },
-        { value: 'muslim', label: 'Muslim' },
-        { value: 'others', label: 'Others' }
-      ];
-
-      const communityOptions = [
-        { value: '', label: 'Select Community' },
-        { value: 'oc', label: 'OC' },
-        { value: 'bc', label: 'BC' },
-        { value: 'mbc', label: 'MBC' },
-        { value: 'bcm', label: 'BCM' },
-        { value: 'sc', label: 'SC' },
-        { value: 'sca', label: 'SCA' },
-        { value: 'st', label: 'ST' },
-        { value: 'dnc-dnt', label: 'DNC/DNT' }
-      ];
+  const currentYear = new Date().getFullYear();
 
 
-      const occupationOptions = [
-        { value: '', label: 'Select Occupation' },
-        { value: 'govt', label: 'Govt' },
-        { value: 'ngo', label: 'NGO' },
-        { value: 'home-maker', label: 'Home Maker' },
-        { value: 'business', label: 'Business' },
-        { value: 'labour', label: 'Labour' }
-      ];
-
-      const educationQualificationOptions = [
-        { value: '', label: 'Select Qualification' },
-        { value: 'primary', label: 'Primary' },
-        { value: 'middle', label: 'Middle' },
-        { value: 'high-school', label: 'High School' },
-        { value: 'hsc', label: 'Hsc' },
-        { value: 'graduate', label: 'Graduate' }
-      ];
-
-      const mediumOfStudyOptions = [
-        { value: '', label: 'Select Medium' },
-        { value: 'tamil', label: 'Tamil' },
-        { value: 'english', label: 'English' }
-      ];
-
-      const yesNoOptions = [
-        { value: '', label: 'Select Option' },
-        { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' }
-      ];
-
-      const yearOptions = Array.from({ length: 50 }, (_, i) => 2000 + i); // 2000 - 2049
-      
-      
-      
+  const startYear = 2015;
+  const yearOptions = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => startYear + i
+  );
       
 
+  const startYearb = 2023;
+  const yearOptionsBatch = Array.from(
+    { length: currentYear - startYearb + 1 },
+    (_, i) => startYearb + i
+  );
+
+  useEffect(() => {
+    if (isEdit) {
+      fetch(`https://cgac-backend.onrender.com/students/${id}`)
+        .then(res => res.json())
+        .then(data => setStudent(data))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [id]);
+
+  if (loading) return <div>Loading...</div>;
+
+      
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
-      <h3 className="text-lg font-bold mb-4">{id ? 'Edit Student' : 'Add New Student'}</h3>
+      <h3 className="text-lg font-bold mb-4">{isEdit ? 'Edit Student' : 'Add New Student'}</h3>
       <Formik
         enableReinitialize={true} 
         initialValues={{
-          applicationNumber: student?.applicationNumber || '',
-          rank: student?.rank || '',
+          // student basic info
+
+          name: student?.name || '',
+          nameAadhaar:student?.name ||'',
+          nameCertificate:student?.name ||'',
+          gender: student?.gender || '',
           registerNo: student?.registerNo || '',
           rollNo: student?.rollNo || '',
           emisNo: student?.emisNo || '',
           umisNo: student?.umisNo || '',
-          degree: degree || '',
-          course: student?.course || '',
-          courseType: student?.courseType || '',
-          cutoff : student?.cutoff|| '',
-          batch : student?.batch || '',
-          stream : student?.stream || '',
-          mediumOfStudy: student?.mediumOfStudy || '',
-          percentageOfMarks: student?.percentageOfMarks || '',
+
+          // student personal info
+
           mobile: student?.mobile || '',
           whatsappNo: student?.whatsappNo || '',
-          name: student?.name || '',
-          nameAadhaar:student?.name ||'',
-          nameCertificate:student?.name ||'',
           email: student?.email || '',
           aadhaarNumber: student?.aadhaarNumber || '',
+          dateOfBirth: student?.dateOfBirth || '',
+          bloodGroup: student?.bloodGroup || '',
+          nationality: student?.nationality || '',
           religion: student?.religion || '',
           community: student?.community || '',
           caste: student?.caste || '',
           communityCertificateNo: student?.communityCertificateNo || '',
-          dateOfBirth: student?.dateOfBirth || '',
-          gender: student?.gender || '',
-          bloodGroup: student?.bloodGroup || '',
           pwd: student?.pwd || '',
           typesOfDisability: student?.typesOfDisability || '',
           percentageOfDisability: student?.percentageOfDisability || '',
@@ -157,12 +88,41 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           ncc: student?.ncc || '',
           sports: student?.sports || '',
           categoryOfSports: student?.categoryOfSports || '',
-          admissionQuota: student?.admissionQuota || '',
-          studentStatus:student?.studentStatus|| '',
-          dateOfAdmission: student?.dateOfAdmission || '',
-          admissionNumber: student?.admissionNumber || '',
           presentAddress: student?.presentAddress || '',
           communicationAddress: student?.communicationAddress || '',
+
+          // present address
+
+          // communication address
+
+          // presentHouseNo:
+          // presentStreet:
+          // presentCity:
+          // presentPanchayath
+          // taluk
+          // district:
+          // pin
+
+          // admission information
+
+          applicationNumber: student?.applicationNumber || '',
+          rank: student?.rank || '',
+          cutoff : student?.cutoff|| '',
+          batch : student?.batch || '',
+          stream : student?.stream || '',
+          degree: student?.degree || '',
+          course: student?.course || '',
+          courseType: student?.courseType || '',
+          mediumOfStudy: student?.mediumOfStudy || '',
+          admissionQuota: student?.admissionQuota || '',
+          dateOfAdmission: student?.dateOfAdmission || '',
+          admissionNumber: student?.admissionNumber || '',
+          hostlerOrDayScholar: student?.hostlerOrDayScholar || '',
+          studentStatus:student?.studentStatus|| '',
+          
+          
+          
+         
           fatherName: student?.fatherName || '',
           fatherMobile: student?.fatherMobile || '',
           fathersOccupation: student?.fathersOccupation || '',
@@ -179,6 +139,8 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           firstGraduateCertificateNo: student?.firstGraduateCertificateNo || '',
           annualIncome: student?.annualIncome || '',
           incomeCertificateNo: student?.incomeCertificateNo || '',
+
+          //  previous school information
           viStandardSchoolName: student?.viStandardSchoolName || '',
           viStandardCity: student?.viStandardCity || '',
           viStandardType: student?.viStandardType || '',
@@ -214,20 +176,26 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
           xiiStandardType: student?.xiiStandardType || '',
           xiiStandardYearStart: student?.xiiStandardYearStart || '',
           xiiStandardYearEnd: student?.xiiStandardYearEnd || '',
+          percentageOfMarksHSC1: student?.percentageOfMarksHSC1 || '',
+          percentageOfMarksHSC2: student?.percentageOfMarksHSC2 || '',
+          percentageOfMarksSSLC: student?.percentageOfMarksSSLC || '',
+
+        // bank information 
+
           bankName: student?.bankName || '',
           branch: student?.branch || '',
           ifsc: student?.ifsc || '',
           micr: student?.micr || '',
           accountType: student?.accountType || '',
           bankAccountNo: student?.bankAccountNo || '',
-          hostlerOrDayScholar: student?.hostlerOrDayScholar || '',
+
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
 
-          const method = student ? "PUT" : "POST";
+          const method = isEdit ? "PUT" : "POST";
           console.log(method,"method");
 
-          const url = student ? `https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application/${id}` : "https://qsyb20b7td.execute-api.ap-south-1.amazonaws.com/dev/application";
+          const url = isEdit ? `https://cgac-backend.onrender.com/students/${id}`:`https://cgac-backend.onrender.com/students/`
           
           try {
             const response = await fetch(url, {
@@ -235,11 +203,12 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ ...values, degree }),
+              body: JSON.stringify(values),
             });
             if (response.ok) {
               setSubmitting(false);
               resetForm();
+              navigate('/deparments')
               // onSuccess();
             } else {
               throw new Error('Failed to save student');
@@ -325,6 +294,16 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <label className="block text-sm text-gray-600">Blood Group</label>
               <Field as="select" name="bloodGroup" className="border px-3 py-2 rounded w-full">
                     {bloodGroups.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                </Field>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Nationality</label>
+              <Field as="select" name="nationality" className="border px-3 py-2 rounded w-full">
+                    {nationalityList.map((group) => (
                     <option key={group.value} value={group.value}>
                         {group.label}
                     </option>
@@ -430,26 +409,59 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <label className="block text-sm text-gray-600">Cut Off</label>
               <Field name="cutoff" className="border px-3 py-2 rounded w-full" />
             </div>
-            <div>
-              <label className="block text-sm text-gray-600">batch</label>
-              <Field name="batch" className="border px-3 py-2 rounded w-full" />
+            <div> 
+              <label className="block text-sm text-gray-600">Batch</label>
+              <Field as="select" name="batch" className="border px-3 py-2 rounded w-full">
+             
+              {yearOptionsBatch.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+
+            </Field>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Stream</label>
-              <Field name="stream" className="border px-3 py-2 rounded w-full" />
+              <Field as='select' name="stream" className="border px-3 py-2 rounded w-full">
+              {streamList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+              </Field>
             </div>
 
             <div>
               <label className="block text-sm text-gray-600">Degree</label>
-              <Field name="degree" className="border px-3 py-2 rounded w-full" />
+              <Field  as='select' name="degree" className="border px-3 py-2 rounded w-full">
+              {degreeList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                    </Field>
+
             </div>
             <div>
               <label className="block text-sm text-gray-600">Course Type</label>
-              <Field name="courseType" className="border px-3 py-2 rounded w-full" />
+              <Field  as='select' name="courseType" className="border px-3 py-2 rounded w-full">
+              {courseTypeList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                    </Field>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Course</label>
-              <Field name="course" className="border px-3 py-2 rounded w-full" />
+              <Field as='select' name="course" className="border px-3 py-2 rounded w-full" >
+              {courseList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                        {group.label}
+                    </option>
+                    ))}
+                    </Field>
             </div>
             <div>
               <label className="block text-sm text-gray-600">Medium of Study</label>
@@ -490,7 +502,7 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <label className="block text-sm text-gray-600">Student Status</label>
               <Field as='select' name="studentStatus" className="border px-3 py-2 rounded w-full">
               
-              {hostler.map((group) => (
+              {studentStatusList.map((group) => (
                     <option key={group.value} value={group.value}>
                         {group.label}
                     </option>
@@ -864,7 +876,7 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
               <Field name="xiiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
-              <label className="block text-sm text -gray-600">City of School</label>
+              <label className="block text-sm text-gray-600">City of School</label>
               <Field name="xiiStandardCity" className="border px-3 py-2 rounded w-full" />
             </div>
             <div>
@@ -903,7 +915,15 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
 
             <div>
               <label className="block text-sm text-gray-600">Percentage of Marks in +2</label>
-              <Field name="percentageOfMarks" type="number" className="border px-3 py-2 rounded w-full" />
+              <Field name="percentageOfMarksHSC2" type="number" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Percentage of Marks in +1</label>
+              <Field name="percentageOfMarksHSC1" type="number" className="border px-3 py-2 rounded w-full" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600">Percentage of Marks in 10</label>
+              <Field name="percentageOfMarksSSLC" type="number" className="border px-3 py-2 rounded w-full" />
             </div>
            
               
