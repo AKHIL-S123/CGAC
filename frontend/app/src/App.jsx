@@ -11,6 +11,8 @@ import CreateStudent from './pages/CreateStudent';
 import Login from './pages/Login';
 import ProtectedRoute from './components/Protected';
 import { useLocation } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css';
 export default function App() {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,10 +45,24 @@ export default function App() {
 
   if (loading === false && !role && location.pathname !== '/login') {
     console.log("redirected to login")
+    toast.info('Redirecting to login...');
     return <Navigate to="/login" />;
   }
   
   return (
+    <div>
+         <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        newestOnTop={false} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover ={false}
+      />
+
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<Layout />}>
@@ -82,6 +98,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/departments/:department"
           element={
@@ -108,5 +125,6 @@ export default function App() {
         />
       </Route>
     </Routes>
+    </div>
   );
 }

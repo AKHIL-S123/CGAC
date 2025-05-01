@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../actions/api';
+import Modal from './Modal'; // Import Modal component
 
 export default function StudentList({ degree, subject }) {
   const [students, setStudents] = useState([]);
@@ -9,14 +10,14 @@ export default function StudentList({ degree, subject }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState(null); // State for the selected student
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
 
   const navigate = useNavigate();
 
-  // Function to fetch students based on current page and batch year
+  // Fetch students based on current page and batch year
   const fetchStudents = async () => {
     try {
-      console.log('Started to fetch students...');
-      
       setLoading(true); // Start loading
 
       // Make the API call to get students based on the current page and batch year
@@ -26,9 +27,6 @@ export default function StudentList({ degree, subject }) {
         params: { page: currentPage, limit: 100, batch: year },
       });
 
-      console.log('Fetched students data:', data);
-
-      // Update the state with the fetched students data
       setStudents(data.data || []);
       setTotalPages(data.paging.total_page || 1);  // Set total pages for pagination
     } catch (error) {
@@ -38,32 +36,20 @@ export default function StudentList({ degree, subject }) {
     }
   };
 
-  // Fetch students on initial load and whenever currentPage or year changes
   useEffect(() => {
     fetchStudents();  // Fetch the students when currentPage or year changes
-  }, [currentPage, year]);  // This triggers every time currentPage or year changes
+  }, [currentPage, year]);
 
-  // Handle search query change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleRowClick = (student) => {
+    setSelectedStudent(student);
+    setIsModalOpen(true); // Open the modal
   };
 
-  // Handle year change
-  const handleYearChange = (e) => {
-    setYear(e.target.value);  // This will trigger fetchStudents to be called on year change
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedStudent(null);
   };
 
-  // Handle pagination changes
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);  // This will trigger fetchStudents to be called on page change
-  };
-
-  // Check if we need to disable the Next button
-  const isNextPageDisabled = () => {
-    return currentPage >= totalPages;
-  };
-
-  // Filter students based on the search query
   const filteredStudents = students.filter(
     (student) =>
       (searchQuery === '' ||
@@ -81,14 +67,14 @@ export default function StudentList({ degree, subject }) {
               type="number"
               placeholder="Filter by Batch"
               value={year}
-              onChange={handleYearChange}
+              onChange={(e) => setYear(e.target.value)}
               className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
               placeholder="Search by Application Number or Name"
               value={searchQuery}
-              onChange={handleSearchChange}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -121,7 +107,11 @@ export default function StudentList({ degree, subject }) {
               </tr>
             ) : filteredStudents.length > 0 ? (
               filteredStudents.map((student) => (
-                <tr key={student._id} className="border-t hover:bg-gray-50">
+                <tr
+                  key={student._id}
+                  className="border-t hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleRowClick(student)} // Open the modal on row click
+                >
                   <td className="p-4">{student.applicationNumber}</td>
                   <td className="p-4">{student.name}</td>
                   <td className="p-4">{student.batch}</td>
@@ -149,7 +139,7 @@ export default function StudentList({ degree, subject }) {
       {/* Pagination */}
       <div className="mt-4 flex justify-between items-center">
         <button
-          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
           className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
           disabled={currentPage === 1}
         >
@@ -161,13 +151,16 @@ export default function StudentList({ degree, subject }) {
         </span>
 
         <button
-          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
           className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          disabled={isNextPageDisabled()}
+          disabled={currentPage >= totalPages}
         >
           Next
         </button>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && <Modal student={selectedStudent} onClose={closeModal} />}
     </div>
   );
 }

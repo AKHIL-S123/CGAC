@@ -18,7 +18,8 @@ export default function StudentForm({ degree, student, onSuccess, id }) {
       const sex = [
         { value: '', label: 'Select Gender' },
         { value: 'Female', label: 'Female' },
-        { value: 'Male', label: 'Male' }
+        { value: 'Male', label: 'Male' },
+        { value: 'Third Gender', label: 'Third Gender' }
       ]
 
       const hostler =[
