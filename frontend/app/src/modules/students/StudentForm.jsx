@@ -8,7 +8,7 @@ import {
  } from './constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState,useEffect } from 'react';
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function StudentForm() {
 
@@ -39,7 +39,7 @@ export default function StudentForm() {
 
   useEffect(() => {
     if (isEdit) {
-      fetch(`https://cgac-backend.onrender.com/students/${id}`)
+      fetch(`${API_BASE_URL}/students/${id}`)
         .then(res => res.json())
         .then(data => setStudent(data))
         .finally(() => setLoading(false));
@@ -159,7 +159,7 @@ export default function StudentForm() {
           ixStandardSchoolName: student?.ixStandardSchoolName || '',
           ixStandardCity: student?.ixStandardCity || '',
           ixStandardType: student?.ixStandardType || '',
-          ixStandardYeartart: student?.ixStandardYearStart || '',
+          ixStandardYearStart: student?.ixStandardYearStart || '',
           ixStandardYearEnd: student?.ixStandardYearEnd || '',
           xStandardSchoolName: student?.xStandardSchoolName || '',
           xStandardCity: student?.xStandardCity || '',
@@ -195,7 +195,9 @@ export default function StudentForm() {
           const method = isEdit ? "PUT" : "POST";
           console.log(method,"method");
 
-          const url = isEdit ? `https://cgac-backend.onrender.com/students/${id}`:`https://cgac-backend.onrender.com/students/`
+          const url = isEdit ? `${API_BASE_URL}/students/${id}`:`${API_BASE_URL}/students/`
+
+          console.log("url in form of add/edit",url)
           
           try {
             const response = await fetch(url, {
@@ -207,8 +209,16 @@ export default function StudentForm() {
             });
             if (response.ok) {
               setSubmitting(false);
-              resetForm();
-              navigate('/deparments')
+
+              const a = values.course
+              const b = values.degree
+             console.log("aaaaaaaaaa",a,b)
+              const formattedCourse = values.course.replace(/\s+/g, '_');
+              const formattedDegree = values.degree.replace(/\s+/g, '_');
+              console.log("xxxxxxxxxxxxxx",`/departments/${formattedDegree}-${formattedCourse}`)
+              navigate(`/departments/${formattedDegree}-${formattedCourse}`);
+              navigate(-1)
+              // resetForm();
               // onSuccess();
             } else {
               throw new Error('Failed to save student');

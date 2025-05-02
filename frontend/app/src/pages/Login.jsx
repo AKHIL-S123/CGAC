@@ -1,69 +1,54 @@
 import { useState } from "react";
-import ENV from "../environment";
+import { login } from "../api/endpoints"; // use your wrapper
 import collegeImage from "../assets/1.png";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const response = await fetch(`${ENV.API_BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-
-      const data = await response.json();
+      const data = await login({ email, password }); // <--- USE endpoint function
       const token = data.access_token;
 
       localStorage.setItem("access_token", token);
       const decoded = JSON.parse(atob(token.split(".")[1]));
       const userRole = decoded.role;
       localStorage.setItem("user_role", userRole);
-      
-         // Notify user of successful login
-         toast.success("Login successful!");
+
+      toast.success("Login successful!");
 
       setTimeout(() => {
         window.location.href = "/";
-      }, 3000); // Adjust the delay (1000ms = 1 second)
-
-
+      }, 3000);
     } catch (err) {
       console.error(err);
       setError("Incorrect email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden font-sans">
-      {/* Background Image */}
       <img
         src={collegeImage}
         alt="college"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
-
-      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 z-10" />
 
-      {/* Login Box */}
       <div className="relative z-20 h-full flex items-center justify-end px-10">
         <div
           className="animate-fade-in backdrop-blur-xl bg-white/20 border border-white/30 p-10 rounded-3xl w-full max-w-md shadow-2xl"
-          style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}
+          style={{ boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)" }}
         >
           <h2 className="text-4xl font-bold mb-6 text-white text-center">Login</h2>
 
@@ -87,15 +72,17 @@ function Login() {
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg hover:opacity-90 transition duration-200"
+              disabled={loading}
+              className={`w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg transition duration-200 ${
+                loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>
       </div>
 
-      {/* Animation CSS */}
       <style jsx>{`
         .animate-fade-in {
           animation: fadeIn 1s ease-in-out;

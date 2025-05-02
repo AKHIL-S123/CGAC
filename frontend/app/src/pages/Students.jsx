@@ -4,14 +4,18 @@ import StudentList from '../modules/students/StudentList';
 
 export default function Students() {
   const { department } = useParams();
-  const [degree, ...subjectParts] = department.split('-');
-  const subject = subjectParts.join('_').replace(/_/g, ' ');
-
-
+console.log(department,"oooooooooooooooooooooooooooooo")
+  const { degree, subject } = useMemo(() => {
+    const [deg, ...subjectParts] = department.split('-');
+    return {
+      degree: deg,
+      subject: subjectParts.join('_').replace(/_/g, ' '),
+    };
+  }, [department]); // Only recompute if `department` changes
 
   return (
     <div className="p-6">
-      <StudentList degree={degree} subject={subject}/>
+      <StudentList degree={degree} subject={subject} />
     </div>
   );
 }

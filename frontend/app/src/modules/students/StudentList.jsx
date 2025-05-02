@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../actions/api';
 import Modal from './Modal'; // Import Modal component
 import DeleteStudentButton from './DeleteStudent';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function StudentList({ degree, subject }) {
   const [students, setStudents] = useState([]);
@@ -23,8 +24,10 @@ export default function StudentList({ degree, subject }) {
       setLoading(true); // Start loading
 
       // Make the API call to get students based on the current page and batch year
+
+      console.log("student_list url",`${API_BASE_URL}/students`)
       const data = await apiRequest({
-        url: 'https://cgac-backend.onrender.com/students',
+        url: `${API_BASE_URL}/students`,
         method: 'GET',
         params: { page: currentPage, limit: 100, batch: year },
       });

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import ConfirmModal from './ConfirmModal'; // Import modal component
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function DeleteStudentButton({ studentId, onDeleteSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://cgac-backend.onrender.com/students/${studentId}`, {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
         method: 'DELETE',
       });
 
