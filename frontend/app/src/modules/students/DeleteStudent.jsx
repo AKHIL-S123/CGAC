@@ -4,8 +4,10 @@ import { toast } from 'react-toastify';
 import ConfirmModal from './ConfirmModal'; // Import modal component
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function DeleteStudentButton({ studentId, onDeleteSuccess }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function DeleteStudentButton({ studentId, handleform }) {
+	
+
+  
 
   const handleDelete = async () => {
     try {
@@ -18,35 +20,24 @@ export default function DeleteStudentButton({ studentId, onDeleteSuccess }) {
       }
 
       toast.success('Student deleted successfully');
-      if (onDeleteSuccess) onDeleteSuccess();
+      if (handleform) handleform();
     } catch (error) {
       console.error('Error deleting student:', error);
       toast.error('Failed to delete student');
     } finally {
-      setIsModalOpen(false);
+		console.log('deleted')
     }
   };
 
   return (
     <>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsModalOpen(true);
-        }}
-        className="text-red-600 hover:text-red-800 ml-2"
-        title="Delete"
-      >
-        <FaTrash size={20} />
-      </button>
-
-      {isModalOpen && (
+    
         <ConfirmModal
           message="Are you sure you want to delete this student?"
           onConfirm={handleDelete}
-          onCancel={() => setIsModalOpen(false)}
+		  onCancel={handleform}
         />
-      )}
+   
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { FiHome, FiUser, FiSettings, FiMenu, FiUsers } from 'react-icons/fi'
 import logo from '../assets/logo.png';
@@ -11,7 +11,14 @@ const menu = [
 ]
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    const storedCollapsed = localStorage.getItem('sidebarCollapsed');
+    return storedCollapsed === 'true' ? true : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', collapsed);
+  }, [collapsed]);
 
   return (
     <div className={`bg-white border-r shadow-sm ${collapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>

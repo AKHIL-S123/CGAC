@@ -31,19 +31,18 @@ export default function App() {
     setLoading(false);
 
     // Logging
-    console.log('Fetched user role from localStorage:', userRole);
-    console.log('Loading finished:', loading);
+ 
   }, []);
 
-  console.log('App Rendered');
-  console.log('Role in App:', role);
-  console.log('Loading in App:', loading);
+  // console.log('App Rendered');
+  // console.log('Role in App:', role);
+  // console.log('Loading in App:', loading);
 
   // If no role and loading is finished, redirect to login
   const location = useLocation();
 
   if (loading === false && !role && location.pathname !== '/login') {
-    console.log("redirected to login")
+    // console.log("redirected to login")
     toast.info('Redirecting to login...');
     return <Navigate to="/login" />;
   }

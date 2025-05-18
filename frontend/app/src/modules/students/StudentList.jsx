@@ -1,12 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { FaTrash, FaEdit } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPencilAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../actions/api';
 import Modal from './Modal'; // Import Modal component
 import DeleteStudentButton from './DeleteStudent';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import StudentForm from './StudentForm';
+import DynamicTable from '../../components/DynamicTable';
+import { FiTrash2 } from 'react-icons/fi';
 
 export default function StudentList({ degree, subject }) {
+
+  const columns = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'age', label: 'Age', sortable: true },
+    { key: 'location', label: 'Location'},
+    { key: 'actions', label: 'Actions' },
+  ];
+  
+ 
+
+  const scopedSlots = {
+    actions: (row) => (
+      <div className="flex gap-3">
+        <button
+          onClick={() =>{
+            handleStudentForm('edit')
+            setSelectedStudent(row)
+          }}
+          className="text-blue-500 hover:text-blue-700"
+        >
+          <FaEdit size={20} />
+        </button>
+        <button
+         onClick={() => handleStudentDeleteForm(row)}
+          className="text-red-500 hover:text-red-700 cursor-pointer"
+        >
+          <FaTrash size={20} />
+        </button>
+      </div>
+    )
+  };
+  
+  const handleSort = (columnKey, direction) => {
+    console.log(`Sort by ${columnKey} in ${direction} order`);
+    // You can implement the sorting logic here or fetch sorted data from API
+  };
   const [students, setStudents] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear().toString()); // Default to current year
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +54,63 @@ export default function StudentList({ degree, subject }) {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null); // State for the selected student
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [showForm,setShowForm]= useState(false)
+  const [editMode,setEditMode] = useState(false);
+  const [showDeleteForm,setShowDeleteForm] = useState(false);
+
+  const handleStudentForm = (mode) => {
+
+    console.log("handle mode")
+
+    if (mode=='edit') {
+      setShowForm(true);
+      setEditMode(true);
+    }
+
+    else if (mode=='close') {
+      setShowForm(false);
+      setEditMode(false);
+
+    }
+	 else if (mode=='close_with_refresh') {
+      setShowForm(false);
+      setEditMode(false);
+	  fetchStudents();  
+
+    }
+    else {
+      setShowForm(true);
+    }
+  
+    console.debug("mode",mode)
+  };
+  
+  
+
+  const handleStudentDeleteForm = (student = null) => {
+	console.log("akhill")
+	  
+    setSelectedStudent(student);
+    setShowDeleteForm(true);
+    setShowForm(false);       // Prevent form clash
+    setEditMode(false);
+  };
+
+const handleCloseDeleteForm = ()=>{
+	setSelectedStudent(null);
+    setShowDeleteForm(false);
+	
+}
+
+
+const handleCloseDeleteForm_reload = () =>{
+	setSelectedStudent(null);
+    setShowDeleteForm(false);
+	 fetchStudents(); 
+	
+}
+
+
 
   const navigate = useNavigate();
 
@@ -50,6 +146,7 @@ export default function StudentList({ degree, subject }) {
     setIsModalOpen(true); // Open the modal
   };
 
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);
@@ -63,118 +160,99 @@ export default function StudentList({ degree, subject }) {
   );
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      {/* Filters and Search */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-4">
-            <input
-              type="number"
-              placeholder="Filter by Batch"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="text"
-              placeholder="Search by Application Number or Name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-            />
+ 
+  <>
+    {!showForm && (
+      <div className="p-4 bg-[#CADCFC] rounded-lg shadow-md">
+        {/* Filters and Search */}
+        <div className="mb-4">
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-4">
+              <input
+                type="number"
+                placeholder="Filter by Batch"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="border bg-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                placeholder="Search by Application Number or Name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+              onClick={() => handleStudentForm()}
+            >
+              Add Student
+            </button>
           </div>
+        </div>
+
+        {/* Table */}
+        <DynamicTable
+          columns={columns}
+          data={students}
+          scopedSlots={scopedSlots}
+          onSort={handleSort}
+          onRowClick={handleRowClick}
+        />
+
+        {/* Pagination */}
+        <div className="mt-4 flex justify-between items-center">
           <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
-            onClick={() => navigate('/add-student')}
+            disabled={currentPage === 1}
           >
-            Add Student
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+            disabled={currentPage >= totalPages}
+          >
+            Next
           </button>
         </div>
       </div>
+    )}
 
-      {/* Table */}
-      <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg shadow-md">
-        <table className="min-w-full bg-white border border-gray-300 rounded-md">
-          <thead className="bg-gray-100 text-left text-sm shadow-md">
-            <tr>
-              <th className="p-4 border-b">Application Number</th>
-              <th className="p-4 border-b">Name</th>
-              <th className="p-4 border-b">Batch</th>
-              <th className="p-4 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="max-h-60 overflow-y-auto">
-            {loading ? (
-              <tr>
-                <td colSpan="4" className="p-4 text-center text-gray-500">
-                  Loading...
-                </td>
-              </tr>
-            ) : filteredStudents.length > 0 ? (
-              filteredStudents.map((student) => (
-                <tr
-                  key={student._id}
-                  className="border-t hover:bg-gray-50 cursor-pointer"
-                  // Open the modal on row click
-                >
-                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.applicationNumber}</td>
-                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.name}</td>
-                  <td className="p-4"  onClick={() => handleRowClick(student)}>{student.batch}</td>
-                  <td className="p-4 flex justify-around">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/edit-student/${student._id}`);
-                      }}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Edit"
-                    >
-                      <FaEdit size={20} />
-                    </button>
-
-                      <DeleteStudentButton
-                        studentId={student._id}
-                        onDeleteSuccess={fetchStudents}
-                      />
-                    </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="p-4 text-center text-gray-500">
-                  No students found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-4 flex justify-between items-center">
-        <button
-          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        <span className="text-sm text-gray-700">
-          Page {currentPage} of {totalPages}
-        </span>
-
-        <button
-          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          disabled={currentPage >= totalPages}
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Modal */}
+    {/* Modal and Forms */}
+    <div>
       {isModalOpen && <Modal student={selectedStudent} onClose={closeModal} />}
+      {showDeleteForm && (
+        <DeleteStudentButton
+          studentId={selectedStudent._id}
+          handleform={handleCloseDeleteForm_reload}
+		  onClose={handleCloseDeleteForm}
+        />
+      )}
+      {showForm && (
+        <StudentForm
+          editMode={editMode}
+          degree="degree"
+          handleform={handleStudentForm}
+          initialData={selectedStudent}
+        />
+      )}
     </div>
-  );
-}
+  </>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  ) 
+  
+  }

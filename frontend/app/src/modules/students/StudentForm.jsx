@@ -1,26 +1,28 @@
 import { Formik, Form, Field } from 'formik';
-import { 
-  bloodGroups, courseList,courseTypeList,
-  streamList,sex,hostler,schooltype,bankOptions,accountOptions,
-  religionOptions,communityOptions,occupationOptions,educationQualificationOptions,mediumOfStudyOptions,yesNoOptions,
-  nationalityList,degreeList,
+import {
+  bloodGroups, courseList, courseTypeList,
+  streamList, sex, hostler, schooltype, bankOptions, accountOptions,
+  religionOptions, communityOptions, occupationOptions, educationQualificationOptions, mediumOfStudyOptions, yesNoOptions,
+  nationalityList, degreeList,districtList,
   studentStatusList
- } from './constants';
+} from './constants';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { FaArrowLeft, FaTimes } from 'react-icons/fa';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function StudentForm() {
 
-  const { id } = useParams();
+
+export default function StudentForm({ editMode, degree, initialData, handleform }) {
+
+
+  console.log('initialData', initialData)
   const navigate = useNavigate();
-  const isEdit = Boolean(id);
-  const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const isEdit = editMode === 'edit';
+  const [loading, setLoading] = useState(false);
 
+  const student = initialData
 
-    console.log(student?.applicationNumber, "student");
-    
   const currentYear = new Date().getFullYear();
 
 
@@ -29,7 +31,7 @@ export default function StudentForm() {
     { length: currentYear - startYear + 1 },
     (_, i) => startYear + i
   );
-      
+
 
   const startYearb = 2023;
   const yearOptionsBatch = Array.from(
@@ -37,31 +39,40 @@ export default function StudentForm() {
     (_, i) => startYearb + i
   );
 
-  useEffect(() => {
-    if (isEdit) {
-      fetch(`${API_BASE_URL}/students/${id}`)
-        .then(res => res.json())
-        .then(data => setStudent(data))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (isEdit) {
+  //     fetch(`${API_BASE_URL}/students/${id}`)
+  //       .then(res => res.json())
+  //       .then(data => setStudent(data))
+  //       .finally(() => setLoading(false));
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // }, [id]);
 
   if (loading) return <div>Loading...</div>;
 
-      
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
-      <h3 className="text-lg font-bold mb-4">{isEdit ? 'Edit Student' : 'Add New Student'}</h3>
+      {/* <h3 className="text-lg font-bold mb-4">{isEdit ? 'Edit Student' : 'Add New Student'}</h3> */}
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => handleform('close')} className="focus:outline-none cursor-pointer">
+          <FaArrowLeft className="text-lg" />
+        </button>
+        <h3 className="text-lg font-bold">{isEdit ? 'Edit Student' : 'Add New Student'}</h3>
+        <button onClick={() => handleform('close')} className="focus:outline-none">
+          <FaTimes className="text-lg text-red-500 cursor-pointer" color='red' />
+        </button>
+      </div>
       <Formik
-        enableReinitialize={true} 
+        enableReinitialize={true}
         initialValues={{
           // student basic info
 
           name: student?.name || '',
-          nameAadhaar:student?.name ||'',
-          nameCertificate:student?.name ||'',
+          nameAadhaar: student?.nameAadhaar || '',
+          nameCertificate: student?.nameCertificate || '',
           gender: student?.gender || '',
           registerNo: student?.registerNo || '',
           rollNo: student?.rollNo || '',
@@ -88,28 +99,32 @@ export default function StudentForm() {
           ncc: student?.ncc || '',
           sports: student?.sports || '',
           categoryOfSports: student?.categoryOfSports || '',
-          presentAddress: student?.presentAddress || '',
-          communicationAddress: student?.communicationAddress || '',
-
           // present address
 
-          // communication address
+          presentHouseNo: student?.presentHouseNo || '',
+          presentStreet: student?.presentStreet || '',
+          presentPlace: student?.presentPlace || '',
+          presentPanchayath: student?.presentPanchayath || '',
+          presentTaluk: student?.presentTaluk || '',
+          presentDistrict: student?.presentDistrict || '',
+          presentPin: student?.permanentPinresentPin || '',
+          // permanent address
 
-          // presentHouseNo:
-          // presentStreet:
-          // presentCity:
-          // presentPanchayath
-          // taluk
-          // district:
-          // pin
+          permanentHouseNo: student?.presentHouseNo || '',
+          permanentStreet: student?.permanentStreet || '',
+          permanentPlace: student?.permanentPlace || '',
+          permanentPanchayath: student?.permanentPanchayath || '',
+          permanentTaluk: student?.permanentTaluk || '',
+          permanentDistrict: student?.permanentDistrict || '',
+          permanentPin: student?.permanentPin || '',
 
           // admission information
 
           applicationNumber: student?.applicationNumber || '',
           rank: student?.rank || '',
-          cutoff : student?.cutoff|| '',
-          batch : student?.batch || '',
-          stream : student?.stream || '',
+          cutoff: student?.cutoff || '',
+          batch: student?.batch || '',
+          stream: student?.stream || '',
           degree: student?.degree || '',
           course: student?.course || '',
           courseType: student?.courseType || '',
@@ -118,11 +133,11 @@ export default function StudentForm() {
           dateOfAdmission: student?.dateOfAdmission || '',
           admissionNumber: student?.admissionNumber || '',
           hostlerOrDayScholar: student?.hostlerOrDayScholar || '',
-          studentStatus:student?.studentStatus|| '',
-          
-          
-          
-         
+          studentStatus: student?.studentStatus || '',
+
+
+          // FAMILY INFORMATION
+
           fatherName: student?.fatherName || '',
           fatherMobile: student?.fatherMobile || '',
           fathersOccupation: student?.fathersOccupation || '',
@@ -180,7 +195,7 @@ export default function StudentForm() {
           percentageOfMarksHSC2: student?.percentageOfMarksHSC2 || '',
           percentageOfMarksSSLC: student?.percentageOfMarksSSLC || '',
 
-        // bank information 
+          // bank information 
 
           bankName: student?.bankName || '',
           branch: student?.branch || '',
@@ -191,33 +206,59 @@ export default function StudentForm() {
 
         }}
         onSubmit={async (values, { setSubmitting, resetForm }) => {
+			
+			 const parseIntOrNone = (val) => {
+			  if (val === '' || val === null || val === undefined) return null;
+			  const parsed = parseInt(val, 10);
+			  return isNaN(parsed) ? null : parsed;
+			};
+
+			// Function to parse float values
+			const parseFloatOrNone = (val) => {
+			  if (val === '' || val === null || val === undefined) return null;
+			  const parsed = parseFloat(val);
+			  return isNaN(parsed) ? null : parsed;
+			};
+
+			// Define the fields that should be parsed as integers and floats
+			const numericFields = [
+			  { field: 'percentageOfMarksHSC1', type: 'float' },
+			  { field: 'percentageOfMarksHSC2', type: 'float' },
+			  { field: 'percentageOfMarksSSLC', type: 'float' }
+			  // add more fields as necessary
+			];
+
+			const cleanedValues = {
+			  ...values,
+			  ...Object.fromEntries(
+				numericFields.map(({ field, type }) => {
+				  // Choose the correct parser based on the field type
+				  const parseFunction = type === 'int' ? parseIntOrNone : parseFloatOrNone;
+				  return [field, parseFunction(values[field])];
+				})
+			  ),
+			};
+  
 
           const method = isEdit ? "PUT" : "POST";
-          console.log(method,"method");
+          console.log(method, "method");
 
-          const url = isEdit ? `${API_BASE_URL}/students/${id}`:`${API_BASE_URL}/students/`
+          const url = isEdit ? `${API_BASE_URL}/students/${id}` : `${API_BASE_URL}/students/`
 
-          console.log("url in form of add/edit",url)
-          
+          console.log("url in form of add/edit", url)
+
           try {
             const response = await fetch(url, {
               method: method,
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(values),
+              body: JSON.stringify(cleanedValues),
             });
             if (response.ok) {
               setSubmitting(false);
+              handleform('close_with_refresh')
 
-              const a = values.course
-              const b = values.degree
-             console.log("aaaaaaaaaa",a,b)
-              const formattedCourse = values.course.replace(/\s+/g, '_');
-              const formattedDegree = values.degree.replace(/\s+/g, '_');
-              console.log("xxxxxxxxxxxxxx",`/departments/${formattedDegree}-${formattedCourse}`)
-              navigate(`/departments/${formattedDegree}-${formattedCourse}`);
-              navigate(-1)
               // resetForm();
               // onSuccess();
             } else {
@@ -232,755 +273,833 @@ export default function StudentForm() {
         {({ isSubmitting }) => (
           <Form className="space-y-4 ">
             {/* 1st div ******************************************************/}
-             {/************************************  STUDENT BASIC INFO************************************** */}
-             <h1 className='text-30px font-bold  text-center'> STUDENT BASIC INFO </h1>
-            <div className='grid grid-cols-3 gap-4'>
-            <div>
-              <label className="block text-sm text-gray-600">Name</label>
-              <Field name="name" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">As in AADHAAR</label>
-              <Field name="nameAadhaar" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">As in Certificate</label>
-              <Field name="nameCertificate" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Gender</label>
-              <Field as="select" name="gender" className="border px-3 py-2 rounded w-full" >
-              {sex.map((group) => (
+            {/************************************  STUDENT BASIC INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> STUDENT BASIC INFO </h1>
+            <div className='grid grid-cols-4 gap-4'>
+              <div>
+                <label className="block text-sm text-gray-600">Name</label>
+                <Field name="name" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">As in AADHAAR</label>
+                <Field name="nameAadhaar" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">As in Certificate</label>
+                <Field name="nameCertificate" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Gender</label>
+                <Field as="select" name="gender" className="border px-3 py-2 rounded w-full" >
+                  {sex.map((group) => (
                     <option key={group.value} value={group.value}>
-                        {group.label}
+                      {group.label}
                     </option>
-                    ))}
-                    </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Register No</label>
-              <Field name="registerNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Roll No.</label>
-              <Field name="rollNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">EMIS No.</label>
-              <Field name="emisNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">UMIS No.</label>
-              <Field name="umisNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-          
-              
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Register No</label>
+                <Field name="registerNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Roll No.</label>
+                <Field name="rollNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">EMIS No.</label>
+                <Field name="emisNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">UMIS No.</label>
+                <Field name="umisNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+
             </div>
 
             {/************************************  STUDENT PERSONAL INFO************************************** */}
             <h1 className='text-30px font-bold  text-center'> STUDENT PERSONAL INFO </h1>
             <div className='grid grid-cols-4 gap-4'>
-            <div>
-              <label className="block text-sm text-gray-600">Mobile</label>
-              <Field name="mobile" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">WhatsApp No</label>
-              <Field name="whatsappNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Email</label>
-              <Field name="email" type="email" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Aadhaar Number</label>
-              <Field name="aadhaarNumber" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Date of Birth</label>
-              <Field name="dateOfBirth" type="date" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Blood Group</label>
-              <Field as="select" name="bloodGroup" className="border px-3 py-2 rounded w-full">
-                    {bloodGroups.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Nationality</label>
-              <Field as="select" name="nationality" className="border px-3 py-2 rounded w-full">
-                    {nationalityList.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                </Field>
-            </div>
-
-            <div>
-              <label className="block text -sm text-gray-600">Religion</label>
-              <Field as="select" name="religion" className="border px-3 py-2 rounded w-full" >
-              {religionOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Community</label>
-              <Field as = "select" name="community" className="border px-3 py-2 rounded w-full" >
-              
-              {communityOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Caste</label>
-              <Field name="caste" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Community Certificate No</label>
-              <Field name="communityCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">PwD</label>
-              <Field as='select' name="pwd" className="border px-3 py-2 rounded w-full" >
-              {yesNoOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Types of Disability</label>
-              <Field name="typesOfDisability" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Percentage of Disability</label>
-              <Field name="percentageOfDisability" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Ex-Service Man</label>
-              <Field name="exServiceMan" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">NCC</label>
-              <Field name="ncc" className="border px-3 py-2 rounded w-full" />
+              <div>
+                <label className="block text-sm text-gray-600">Mobile</label>
+                <Field name="mobile" className="border px-3 py-2 rounded w-full" />
               </div>
-            <div>
-              <label className="block text-sm text-gray-600">Sports</label>
-              <Field name="sports" className="border px-3 py-2 rounded w-full" />
-           
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-600">Category of Sports</label>
-              <Field name="categoryOfSports" className="border px-3 py-2 rounded w-full" />
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-600">Present Address</label>
-              <Field name="presentAddress" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Communication Address</label>
-              <Field name="communicationAddress" className="border px-3 py-2 rounded w-full" />
-            </div>
-
-            </div>
-                  
-           {/************************************  ADMISSION INFO************************************** */}
-           <h1 className='text-30px font-bold  text-center'> ADMISSION INFORMATION </h1>
-
-           
-                    
-           <div className='grid grid-cols-4 gap-4'>
-
-           <div>
-              <label className="block text-sm text-gray-600">Application Number</label>
-              <Field name="applicationNumber" className="border px-3 py-2 rounded w-full" />
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-600">Rank</label>
-              <Field name="rank" className="border px-3 py-2 rounded w-full" />
-
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Cut Off</label>
-              <Field name="cutoff" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div> 
-              <label className="block text-sm text-gray-600">Batch</label>
-              <Field as="select" name="batch" className="border px-3 py-2 rounded w-full">
-             
-              {yearOptionsBatch.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Stream</label>
-              <Field as='select' name="stream" className="border px-3 py-2 rounded w-full">
-              {streamList.map((group) => (
+              <div>
+                <label className="block text-sm text-gray-600">WhatsApp No</label>
+                <Field name="whatsappNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Email</label>
+                <Field name="email" type="email" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Aadhaar Number</label>
+                <Field name="aadhaarNumber" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Date of Birth</label>
+                <Field name="dateOfBirth" type="date" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Blood Group</label>
+                <Field as="select" name="bloodGroup" className="border px-3 py-2 rounded w-full">
+                  {bloodGroups.map((group) => (
                     <option key={group.value} value={group.value}>
-                        {group.label}
+                      {group.label}
                     </option>
-                    ))}
-              </Field>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Nationality</label>
+                <Field as="select" name="nationality" className="border px-3 py-2 rounded w-full">
+                  {nationalityList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+
+              <div>
+                <label className="block text -sm text-gray-600">Religion</label>
+                <Field as="select" name="religion" className="border px-3 py-2 rounded w-full" >
+                  {religionOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Community</label>
+                <Field as="select" name="community" className="border px-3 py-2 rounded w-full" >
+
+                  {communityOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Caste</label>
+                <Field name="caste" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Community Certificate No</label>
+                <Field name="communityCertificateNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">PwD</label>
+                <Field as='select' name="pwd" className="border px-3 py-2 rounded w-full" >
+                  {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Types of Disability</label>
+                <Field name="typesOfDisability" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Percentage of Disability</label>
+                <Field name="percentageOfDisability" type="number" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Ex-Service Man</label>
+                <Field name="exServiceMan" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">NCC</label>
+                <Field name="ncc" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Sports</label>
+                <Field name="sports" className="border px-3 py-2 rounded w-full" />
+
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Category of Sports</label>
+                <Field name="categoryOfSports" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+            </div>
+            <h1 className='text-30px font-bold  text-center'> Present Address</h1>
+            <div className='grid grid-cols-4 gap-4'>
+              <div>
+                <label className="block text-sm text-gray-600">House No</label>
+                <Field name="presentHouseNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Street</label>
+                <Field name="presentStreet" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Place</label>
+                <Field name="presentPlace" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Panchayath</label>
+                <Field name="presentPanchayath" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Taluk</label>
+                <Field name="presentTaluk" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">District</label>
+                <Field as='select' name="presentDistrict" className="border px-3 py-2 rounded w-full" >
+				  <option value="">-- Select District --</option>
+				  {districtList.map((district,index) => (
+                    <option key={index} value={district}>
+                      {district}
+                    </option>
+                  ))}
+				  </Field>
+              </div>
+			  
+              <div>
+                <label className="block text-sm text-gray-600">Pin Code</label>
+                <Field name="presentPin" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+
+            </div>
+            {/************************************  Permanent Address INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> Permanent Address</h1>
+
+
+
+            <div className='grid grid-cols-4 gap-4'>
+
+              <div>
+                <label className="block text-sm text-gray-600">House No</label>
+                <Field name="permanentHouseNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Street</label>
+                <Field name="permanentStreet" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Place</label>
+                <Field name="permanentPlace" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Panchayath</label>
+                <Field name="permanentPanchayath" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Taluk</label>
+                <Field name="permanentTaluk" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                
+				<label className="block text-sm text-gray-600">District</label>
+                <Field as='select' name="permanentDistrict" className="border px-3 py-2 rounded w-full" >
+				  <option value="">-- Select District --</option>
+				  {districtList.map((district,index) => (
+                    <option key={index} value={district}>
+                      {district}
+                    </option>
+                  ))}
+				  </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Pin Code</label>
+                <Field name="permanentPin" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-600">Degree</label>
-              <Field  as='select' name="degree" className="border px-3 py-2 rounded w-full">
-              {degreeList.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
+            {/************************************  ADMISSION INFO************************************** */}
+            <h1 className='text-30px font-bold  text-center'> ADMISSION INFORMATION </h1>
+
+
+
+            <div className='grid grid-cols-4 gap-4'>
+
+              <div>
+                <label className="block text-sm text-gray-600">Application Number</label>
+                <Field name="applicationNumber" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Rank</label>
+                <Field name="rank" className="border px-3 py-2 rounded w-full" />
+
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Cut Off</label>
+                <Field name="cutoff" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Batch</label>
+                <Field as="select" name="batch" className="border px-3 py-2 rounded w-full">
+
+                  {yearOptionsBatch.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
                     </option>
-                    ))}
-                    </Field>
+                  ))}
+
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Stream</label>
+                <Field as='select' name="stream" className="border px-3 py-2 rounded w-full">
+                  {streamList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Degree</label>
+                <Field as='select' name="degree" className="border px-3 py-2 rounded w-full">
+                  {degreeList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Course Type</label>
+                <Field as='select' name="courseType" className="border px-3 py-2 rounded w-full">
+                  {courseTypeList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Course</label>
+                <Field as='select' name="course" className="border px-3 py-2 rounded w-full" >
+                  {courseList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Medium of Study</label>
+                <Field as='select' name="mediumOfStudy" className="border px-3 py-2 rounded w-full" >
+
+                  {mediumOfStudyOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Admission Quota</label>
+                <Field name="admissionQuota" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Date of Admission</label>
+                <Field name="dateOfAdmission" type="date" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Admission Number</label>
+                <Field name="admissionNumber" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Hostler / Day Scholar</label>
+                <Field as='select' name="hostlerOrDayScholar" className="border px-3 py-2 rounded w-full">
+
+                  {hostler.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Student Status</label>
+                <Field as='select' name="studentStatus" className="border px-3 py-2 rounded w-full">
+
+                  {studentStatusList.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+
+              </div>
 
             </div>
-            <div>
-              <label className="block text-sm text-gray-600">Course Type</label>
-              <Field  as='select' name="courseType" className="border px-3 py-2 rounded w-full">
-              {courseTypeList.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Course</label>
-              <Field as='select' name="course" className="border px-3 py-2 rounded w-full" >
-              {courseList.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Medium of Study</label>
-              <Field as='select' name="mediumOfStudy" className="border px-3 py-2 rounded w-full" >
-              
-              {mediumOfStudyOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Admission Quota</label>
-              <Field name="admissionQuota" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Date of Admission</label>
-              <Field name="dateOfAdmission" type="date" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Admission Number</label>
-              <Field name="admissionNumber" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Hostler / Day Scholar</label>
-              <Field as='select' name="hostlerOrDayScholar" className="border px-3 py-2 rounded w-full">
-              
-              {hostler.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-              
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Student Status</label>
-              <Field as='select' name="studentStatus" className="border px-3 py-2 rounded w-full">
-              
-              {studentStatusList.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-              
-            </div>
-
-           </div>
 
             {/************************************  FAMILY INFO************************************** */}
             <h1 className='text-30px font-bold  text-center'> FAMILY INFORMATION </h1>
             <div className='grid grid-cols-4 gap-4'>
-            <div>
-              <label className="block text-sm text-gray-600">Father Name</label>
-              <Field name="fatherName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Mobile Number</label>
-              <Field name="fatherMobile" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Father's Occupation</label>
-              <Field  as="select" name="fathersOccupation" className="border px-3 py-2 rounded w-full" >
-              {occupationOptions.map((group) => (
+              <div>
+                <label className="block text-sm text-gray-600">Father Name</label>
+                <Field name="fatherName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Mobile Number</label>
+                <Field name="fatherMobile" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Father's Occupation</label>
+                <Field as="select" name="fathersOccupation" className="border px-3 py-2 rounded w-full" >
+                  {occupationOptions.map((group) => (
                     <option key={group.value} value={group.value}>
-                        {group.label}
+                      {group.label}
                     </option>
-                    ))}
-            </Field>
-              
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Father's Educational Qualification</label>
-              <Field as="select" name="fathersEducation" className="border px-3 py-2 rounded w-full" >
-              {educationQualificationOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-
-            <div>
-            <label className="block text-sm text-gray-600">Mother Name</label>
-            <Field name="motherName" className="border px-3 py-2 rounded w-full" />
-            </div>
-
-            <div>
-            <label className="block text-sm text-gray-600">Mobile Number</label>
-              <Field name="motherMobile" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Mother's Occupation</label>
-              <Field as = "select" name="mothersOccupation" className="border px-3 py-2 rounded w-full">
-              {occupationOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Mother's Educational Qualification</label>
-              <Field as = "select" name="mothersEducation" className="border px-3 py-2 rounded w-full" >
-              {educationQualificationOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Guardian Name</label>
-              <Field name="guardianName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Guardian Number</label>
-              <Field name="guardianNumber" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Single Parent</label>
-              <Field as = "select" name="singleParent" className="border px-3 py-2 rounded w-full" >
-               {yesNoOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Single Girl Child</label>
-              <Field as = "select" name="singleGirlChild" className="border px-3 py-2 rounded w-full" >
-               {yesNoOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-
-            <div>
-              <label  className="block text-sm text-gray-600">First Graduate</label>
-              <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
-              {yesNoOptions.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
-              <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Income Certificate No.</label>
-              <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Annual Income</label>
-              <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-           
+                  ))}
+                </Field>
 
               </div>
+              <div>
+                <label className="block text-sm text-gray-600">Father's Educational Qualification</label>
+                <Field as="select" name="fathersEducation" className="border px-3 py-2 rounded w-full" >
+                  {educationQualificationOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Mother Name</label>
+                <Field name="motherName" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Mobile Number</label>
+                <Field name="motherMobile" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Mother's Occupation</label>
+                <Field as="select" name="mothersOccupation" className="border px-3 py-2 rounded w-full">
+                  {occupationOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Mother's Educational Qualification</label>
+                <Field as="select" name="mothersEducation" className="border px-3 py-2 rounded w-full" >
+                  {educationQualificationOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Guardian Name</label>
+                <Field name="guardianName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Guardian Number</label>
+                <Field name="guardianNumber" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Single Parent</label>
+                <Field as="select" name="singleParent" className="border px-3 py-2 rounded w-full" >
+                  {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Single Girl Child</label>
+                <Field as="select" name="singleGirlChild" className="border px-3 py-2 rounded w-full" >
+                  {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">First Graduate</label>
+                <Field as='select' name="firstGraduate" className="border px-3 py-2 rounded w-full">
+                  {yesNoOptions.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">First Graduate Certificate No.</label>
+                <Field name="firstGraduateCertificateNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Income Certificate No.</label>
+                <Field name="incomeCertificateNo" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Annual Income</label>
+                <Field name="annualIncome" type="number" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+
+            </div>
             {/* ******************************  SCHOOL INFO *********************************/}
             <h1 className='text-30px font-bold  text-center'> PREVIOUS SCHOOL INFORMATION </h1>
             <div className='grid grid-cols-4 gap-4'>
-            <div>
-              <label className="block text-sm text-gray-600">VI Standard School Name</label>
-              <Field name="viStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="viStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as="select" name="viStandardType" className="border px-3 py-2 rounded w-full">
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="viStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="viStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div> 
+              <div>
+                <label className="block text-sm text-gray-600">VI Standard School Name</label>
+                <Field name="viStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="viStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
 
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">VII Standard School Name</label>
-              <Field name="viiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="viiStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as="select" name="viiStandardType" className="border px-3 py-2 rounded w-full" >
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as="select" name="viStandardType" className="border px-3 py-2 rounded w-full">
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="viStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
 
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
                     ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              
-              <div className='flex justify-between'>
-              <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">VIII Standard School Name</label>
-              <Field name="viiiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="viiiStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as="select" name="viiiStandardType" className="border px-3 py-2 rounded w-full" >
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                    </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">IX Standard School Name</label>
-              <Field name="ixStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="ixStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as = "select" name="ixStandardType" className="border px-3 py-2 rounded w-full">
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                      </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="ixStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="ixStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">X Standard School Name</label>
-              <Field name="xStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="xStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as = "select" name="xStandardType" className="border px-3 py-2 rounded w-full" >
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-                      </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="xStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="xStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">XI Standard School Name</label>
-              <Field name="xiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="xiStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-              <Field as='select' name="xiStandardType" className="border px-3 py-2 rounded w-full" >
-              {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
-                    ))}
-            </Field>
+                  </Field>
+                  <Field as="select" name="viStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
 
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="xiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="xiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">XII Standard School Name</label>
-              <Field name="xiiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">City of School</label>
-              <Field name="xiiStandardCity" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of School</label>
-
-            <Field as="select" name="xiiStandardType" className="border px-3 py-2 rounded w-full">
-                    {schooltype.map((group) => (
-                    <option key={group.value} value={group.value}>
-                        {group.label}
-                    </option>
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
                     ))}
-            </Field>
-        
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Year of Study</label>
-              <div className='flex justify-between'>
-              <Field as="select" name="xiiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-              <Field as="select" name="xiiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
-             
-              {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-            </Field>
-            </div>
-            </div>
+                  </Field>
+                </div>
 
-            <div>
-              <label className="block text-sm text-gray-600">Percentage of Marks in +2</label>
-              <Field name="percentageOfMarksHSC2" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Percentage of Marks in +1</label>
-              <Field name="percentageOfMarksHSC1" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Percentage of Marks in 10</label>
-              <Field name="percentageOfMarksSSLC" type="number" className="border px-3 py-2 rounded w-full" />
-            </div>
-           
-              
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">VII Standard School Name</label>
+                <Field name="viiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="viiStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as="select" name="viiStandardType" className="border px-3 py-2 rounded w-full" >
+
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+
+                <div className='flex justify-between'>
+                  <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">VIII Standard School Name</label>
+                <Field name="viiiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="viiiStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as="select" name="viiiStandardType" className="border px-3 py-2 rounded w-full" >
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="viiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="viiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">IX Standard School Name</label>
+                <Field name="ixStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="ixStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as="select" name="ixStandardType" className="border px-3 py-2 rounded w-full">
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="ixStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="ixStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">X Standard School Name</label>
+                <Field name="xStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="xStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as="select" name="xStandardType" className="border px-3 py-2 rounded w-full" >
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="xStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="xStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">XI Standard School Name</label>
+                <Field name="xiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="xiStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+                <Field as='select' name="xiStandardType" className="border px-3 py-2 rounded w-full" >
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="xiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="xiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">XII Standard School Name</label>
+                <Field name="xiiStandardSchoolName" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">City of School</label>
+                <Field name="xiiStandardCity" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of School</label>
+
+                <Field as="select" name="xiiStandardType" className="border px-3 py-2 rounded w-full">
+                  {schooltype.map((group) => (
+                    <option key={group.value} value={group.value}>
+                      {group.label}
+                    </option>
+                  ))}
+                </Field>
+
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Year of Study</label>
+                <div className='flex justify-between'>
+                  <Field as="select" name="xiiStandardYearStart" className="border px-3 py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                  <Field as="select" name="xiiStandardYearEnd" className=" border px-3  py-2 rounded w-[45%]">
+
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </Field>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600">Percentage of Marks in +2</label>
+                <Field name="percentageOfMarksHSC2" type="number" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Percentage of Marks in +1</label>
+                <Field name="percentageOfMarksHSC1" type="number" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Percentage of Marks in 10</label>
+                <Field name="percentageOfMarksSSLC" type="number" className="border px-3 py-2 rounded w-full" />
+              </div>
+
+
             </div>
             <h1 className='text-30px font-bold  text-center'> BANK INFO </h1>
             {/* 4th div */}
             <div className='grid grid-cols-3 gap-4'>
-            <div>
-              <label className="block text-sm text-gray-600">Bank Name</label>
-              <Field as = "select" name="bankName" className="border px-3 py-2 rounded w-full">
-              {bankOptions.map((group) => (
+              <div>
+                <label className="block text-sm text-gray-600">Bank Name</label>
+                <Field as="select" name="bankName" className="border px-3 py-2 rounded w-full">
+                  {bankOptions.map((group) => (
                     <option key={group.value} value={group.value}>
-                        {group.label}
+                      {group.label}
                     </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Branch</label>
-              <Field name="branch" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">IFSC</label>
-              <Field name="ifsc" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">MICR</label>
-              <Field name="micr" className="border px-3 py-2 rounded w-full" />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Type of Account</label>
-              <Field as = "select" name="accountType" className="border px-3 py-2 rounded w-full" >
-              {accountOptions.map((group) => (
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Branch</label>
+                <Field name="branch" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">IFSC</label>
+                <Field name="ifsc" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">MICR</label>
+                <Field name="micr" className="border px-3 py-2 rounded w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Type of Account</label>
+                <Field as="select" name="accountType" className="border px-3 py-2 rounded w-full" >
+                  {accountOptions.map((group) => (
                     <option key={group.value} value={group.value}>
-                        {group.label}
+                      {group.label}
                     </option>
-                    ))}
-            </Field>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">Account No</label>
-              <Field name="bankAccountNo" className="border px-3 py-2 rounded w-full" />
-            </div>
+                  ))}
+                </Field>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600">Account No</label>
+                <Field name="bankAccountNo" className="border px-3 py-2 rounded w-full" />
+              </div>
             </div>
 
             {/* 5th div */}
-         
+
             <button
               type="submit"
               disabled={isSubmitting}

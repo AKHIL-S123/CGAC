@@ -14,7 +14,7 @@ console.log(department,"oooooooooooooooooooooooooooooo")
   }, [department]); // Only recompute if `department` changes
 
   return (
-    <div className="p-6">
+    <div className="">
       <StudentList degree={degree} subject={subject} />
     </div>
   );

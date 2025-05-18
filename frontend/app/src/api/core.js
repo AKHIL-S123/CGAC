@@ -3,7 +3,10 @@ import ENV from "../environment";
 // const API_BASE_URL = ENV.API_BASE_URL;
 
 
-const API_BASE_URL = "https://cgac-backend.onrender.com";
+// const API_BASE_URL = "https://cgac-backend.onrender.com";
+//const API_BASE_URL = "http://127.0.0.1:8003"
+
+const API_BASE_URL = "http://192.168.67.36:8003"
 
 const getToken = () => localStorage.getItem("access_token");
 
