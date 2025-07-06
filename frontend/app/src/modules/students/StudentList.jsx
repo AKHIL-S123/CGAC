@@ -240,7 +240,7 @@ const handleCloseDeleteForm_reload = () =>{
         <StudentForm
           editMode={editMode}
           degree="degree"
-          handleform={handleStudentForm}
+          handleform={hand4eleStudentForm}
           initialData={selectedStudent}
         />
       )}
